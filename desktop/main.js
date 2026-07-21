@@ -3,6 +3,11 @@ const path = require("path");
 const net = require("net");
 const fs = require("fs");
 
+// POS-alg fork: isolate local storage (SQLite DB, session, cache) from any
+// other ALLAL Delivery install on the same machine. Visible name/branding are
+// intentionally kept identical — only the on-disk userData folder differs.
+app.setPath("userData", path.join(app.getPath("appData"), "erp-van-sales-alg"));
+
 let mainWindow;
 let resolvedPort = null;
 let serverStarted = false;

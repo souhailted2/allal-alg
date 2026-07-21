@@ -27,7 +27,7 @@ if (isProduction && !SESSION_SECRET) {
 // cross-origin requests. Defaults to the production web origin; override with a
 // comma-separated CORS_ORIGINS. Server-to-server callers (desktop/mobile sync)
 // send no Origin header and are allowed; unknown browser origins are rejected.
-const allowedOrigins = (process.env.CORS_ORIGINS ?? "https://deleveri.alllal.com")
+const allowedOrigins = (process.env.CORS_ORIGINS ?? "https://alg.alllal.com")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);

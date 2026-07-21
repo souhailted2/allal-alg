@@ -12,7 +12,7 @@ const path  = require("path");
 const { getDb, getSyncMeta, setSyncMeta } = require("./db");
 const { getUserDataPath } = require("./config");
 
-const REMOTE_BASE    = "https://deleveri.alllal.com/api";
+const REMOTE_BASE    = "https://alg.alllal.com/api";
 const SYNC_INTERVAL  = 30_000;  // 30 seconds
 const ONLINE_CHECK   = 20_000;  // 20 seconds
 const REQUEST_TIMEOUT = 15_000;

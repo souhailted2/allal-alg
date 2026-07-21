@@ -73,21 +73,24 @@ jobs:
             rm -f /tmp/deploy.tar.gz
 
             echo "=== Copying API dist ==="
-            mkdir -p /var/www/erp-van-sales/api-server/dist
-            cp -r artifacts/api-server/dist/* /var/www/erp-van-sales/api-server/dist/
+            mkdir -p /var/www/allal-alg/api-server/dist
+            cp -r artifacts/api-server/dist/* /var/www/allal-alg/api-server/dist/
 
             echo "=== Copying frontend dist ==="
-            mkdir -p /var/www/erp-van-sales/frontend
-            cp -r artifacts/erp-van-sales/dist/public/. /var/www/erp-van-sales/frontend/ 2>/dev/null || true
+            mkdir -p /var/www/allal-alg/frontend
+            cp -r artifacts/erp-van-sales/dist/public/. /var/www/allal-alg/frontend/ 2>/dev/null || true
             cd /
             rm -rf /tmp/erp-deploy
 
             echo "=== Reloading PM2 ==="
-            pm2 reload erp-api --update-env || pm2 restart erp-api
+            set -a; [ -f /etc/erp-alg.env ] && . /etc/erp-alg.env; set +a
+            pm2 reload erp-api-alg --update-env \
+              || pm2 start /var/www/allal-alg/api-server/dist/index.mjs --name erp-api-alg --node-args="--enable-source-maps" --update-env
+            pm2 save || true
 
             echo "=== Health check ==="
             sleep 3
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/healthz)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8081/api/healthz)
             echo "Health status: $STATUS"
             if [ "$STATUS" != "200" ]; then
               echo "ERROR: Health check failed with status $STATUS"

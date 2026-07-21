@@ -33,7 +33,7 @@ interface GithubRelease {
 
 async function fetchLatestAndroidRelease(): Promise<ReleaseInfo> {
   const res = await fetch(
-    "https://api.github.com/repos/souhailted2/delivery_van/releases?per_page=10",
+    "https://api.github.com/repos/souhailted2/allal-alg/releases?per_page=10",
     {
       headers: {
         "User-Agent": "erp-van-sales-server/1.0",

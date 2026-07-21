@@ -24,7 +24,7 @@ This sandbox has:
   (NODE_MODULE_VERSION 121); the sandbox's Node is v24 (ABI 137) — the real
   binary can't load under plain `node`.
 - `desktop/server/sync-engine.js` hardcodes `REMOTE_BASE =
-  "https://deleveri.alllal.com/api"` — a **production URL**, which must never
+  "https://alg.alllal.com/api"` — a **production URL**, which must never
   be contacted by automated tests.
 
 **What I did about it (so "prove it" is honest, not assumed):**

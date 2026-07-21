@@ -60,7 +60,7 @@ jobs:
       - name: Generate native Android project (expo prebuild)
         working-directory: artifacts/erp-van-sales-mobile
         run: |
-          EXPO_PUBLIC_API_URL=https://deleveri.alllal.com \
+          EXPO_PUBLIC_API_URL=https://alg.alllal.com \
           npx expo prebuild --platform android --clean --no-install
 
       - name: Set Gradle executable permission
@@ -100,7 +100,7 @@ jobs:
         run: ./gradlew assembleRelease --no-daemon
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false"
-          EXPO_PUBLIC_API_URL: https://deleveri.alllal.com
+          EXPO_PUBLIC_API_URL: https://alg.alllal.com
           NODE_ENV: production
 
       - name: Find built APK
@@ -157,7 +157,7 @@ jobs:
             4. سجّل دخولك بنفس بيانات الويب
 
             ### 🌐 الخادم
-            يتصل التطبيق تلقائياً بـ `https://deleveri.alllal.com`
+            يتصل التطبيق تلقائياً بـ `https://alg.alllal.com`
 
             ### ✨ الميزات
             - وضع Offline مع مزامنة تلقائية عند الاتصال
@@ -187,7 +187,7 @@ jobs:
             4. سجّل دخولك بنفس بيانات الويب
 
             ### 🌐 الخادم
-            يتصل التطبيق تلقائياً بـ `https://deleveri.alllal.com`
+            يتصل التطبيق تلقائياً بـ `https://alg.alllal.com`
 
             ### ✨ الميزات
             - وضع Offline مع مزامنة تلقائية عند الاتصال

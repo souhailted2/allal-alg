@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 
 export const API_URL =
-  process.env["EXPO_PUBLIC_API_URL"] ?? "https://deleveri.alllal.com";
+  process.env["EXPO_PUBLIC_API_URL"] ?? "https://alg.alllal.com";
 
 const SESSION_KEY = "erp_session_sid";
 const SERVER_URL_KEY = "erp_server_url";

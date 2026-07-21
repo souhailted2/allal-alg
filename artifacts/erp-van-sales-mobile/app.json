@@ -15,10 +15,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.erp.vansales"
+      "bundleIdentifier": "com.erp.vansales.alg"
     },
     "android": {
-      "package": "com.erp.vansales",
+      "package": "com.erp.vansales.alg",
       "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
@@ -53,7 +53,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "https://deleveri.alllal.com"
+      "apiUrl": "https://alg.alllal.com"
     }
   }
 }

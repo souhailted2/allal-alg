@@ -541,7 +541,7 @@ export function ElectronSyncButton() {
 
               {showCreds && (
                 <div className="space-y-2 mt-3">
-                  <p className="text-[11px] text-muted-foreground">السيرفر: deleveri.alllal.com</p>
+                  <p className="text-[11px] text-muted-foreground">السيرفر: alg.alllal.com</p>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label className="text-xs">المستخدم</Label>

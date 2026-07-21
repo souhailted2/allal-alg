@@ -132,7 +132,7 @@ This is a **pnpm workspace** monorepo (Node 20/24, TypeScript ~5.9).
     file (`.session-secret`).
 - **`desktop/server/sync-engine.js`** — the offline-first bidirectional sync
   engine. Runs every `SYNC_INTERVAL = 30_000` ms (30s) against
-  `REMOTE_BASE = "https://deleveri.alllal.com/api"` (hardcoded production
+  `REMOTE_BASE = "https://alg.alllal.com/api"` (hardcoded production
   URL). See §7 for full sync details.
 - **Critical packaging note**: the sync engine and all of `desktop/server` are
   bundled into `app.asar` by `electron-builder`. **Editing source files in
@@ -147,7 +147,7 @@ This is a **pnpm workspace** monorepo (Node 20/24, TypeScript ~5.9).
 - **Separate codebase** — Expo + React Native (Expo Router, file-based
   routing under `app/`), built into an **Android APK** via GitHub Actions
   (`build-android.yml`, uses `expo prebuild` + Gradle).
-- Talks to `EXPO_PUBLIC_API_URL=https://deleveri.alllal.com` (production
+- Talks to `EXPO_PUBLIC_API_URL=https://alg.alllal.com` (production
   cloud) — same `/api/sync/v2/*` endpoints as desktop.
 - Local SQLite via `expo-sqlite` (`lib/db.ts`), sync logic in `lib/sync.ts`
   + `contexts/SyncContext.tsx`.
@@ -211,7 +211,7 @@ All three clients converge on one cloud Postgres via `/api/sync/v2/*`
 - **Desktop**: `desktop/server/sync-engine.js` runs `syncOnce()` every 30s —
   pulls (`GET /sync/v2/pull?since=...`) then pushes (`POST /sync/v2/push`)
   local SQLite changes. `REMOTE_BASE` is hardcoded to
-  `https://deleveri.alllal.com/api`.
+  `https://alg.alllal.com/api`.
 - **Mobile**: `lib/sync.ts` + `contexts/SyncContext.tsx`, same
   `/sync/v2/pull` / `/sync/v2/push` endpoints, local SQLite via `lib/db.ts`.
 
@@ -348,7 +348,7 @@ required — see `desktop-sqlite-test-harness` memory).
 - Cloud route: `artifacts/api-server/src/routes/dispatches.ts`.
 - **Desktop**: has NO local dispatches table/route of its own —
   `desktop/server/routes/dispatches.js` is a **pure proxy** to
-  `https://deleveri.alllal.com/api/dispatches*`, using the sync engine's
+  `https://alg.alllal.com/api/dispatches*`, using the sync engine's
   stored admin session cookie (`cloudRequest()` exported from
   `sync-engine.js`).
 - **Critical translation requirement**: a desktop row's **local** integer
@@ -458,7 +458,7 @@ required — see `desktop-sqlite-test-harness` memory).
   writes some raw integer ids without full `sync_id` translation) — deeper
   unification work needed.
 - **Desktop sync engine hardcodes** `REMOTE_BASE =
-  "https://deleveri.alllal.com/api"` — no staging/env-based override; testing
+  "https://alg.alllal.com/api"` — no staging/env-based override; testing
   against staging requires temporarily editing this constant (never commit
   pointing at a non-prod URL by accident, and never point automated tests at
   prod).
@@ -570,7 +570,7 @@ changes must be applied to production Postgres separately/manually.
 3. Java 17 + Android SDK (platform 35, build-tools 35.0.0, NDK
    27.1.12297006).
 4. `expo prebuild --platform android --clean --no-install` with
-   `EXPO_PUBLIC_API_URL=https://deleveri.alllal.com`.
+   `EXPO_PUBLIC_API_URL=https://alg.alllal.com`.
 5. Workaround step for pnpm virtual-store `expo-router/entry.js` missing in
    some peer-dep copies (copies the file into all variant dirs).
 6. `./gradlew assembleRelease` → APK.
@@ -589,8 +589,8 @@ changes must be applied to production Postgres separately/manually.
 | `PORT` | api-server (`src/index.ts`), frontend `vite.config.ts` | HTTP listen port / Vite dev port. Required. |
 | `BASE_PATH` | frontend `vite.config.ts` | Vite `base` path for asset URLs. `/` for production/desktop builds. Required. |
 | `SESSION_SECRET` | api-server `app.ts` | express-session secret. **REQUIRED in production** (since Phase 1, 2026-06-18): `app.ts` throws on boot if `NODE_ENV=production` and it is unset/empty. A throwaway dev fallback is used only when not production. Set in `/etc/erp.env` on Hetzner (persists across deploys). |
-| `CORS_ORIGINS` | api-server `app.ts` | Optional comma-separated browser-origin allowlist for CORS. Defaults to `https://deleveri.alllal.com`. Server-to-server callers (no Origin) are always allowed. |
-| `EXPO_PUBLIC_API_URL` | mobile app | Cloud API base URL (`https://deleveri.alllal.com` in production builds). |
+| `CORS_ORIGINS` | api-server `app.ts` | Optional comma-separated browser-origin allowlist for CORS. Defaults to `https://alg.alllal.com`. Server-to-server callers (no Origin) are always allowed. |
+| `EXPO_PUBLIC_API_URL` | mobile app | Cloud API base URL (`https://alg.alllal.com` in production builds). |
 | `NODE_ENV` | mobile build | `production` for release APK builds. |
 | `HETZNER_HOST` / `HETZNER_USER` / `HETZNER_PASSWORD` | `deploy-hetzner.yml` (GitHub secret) | SSH/SCP credentials for the deploy target. |
 | `GH_TOKEN` / `GITHUB_TOKEN` | `build-exe.yml`, `build-android.yml` | GitHub Releases API access for CI-published artifacts. |
@@ -805,7 +805,7 @@ truck) warehouse→truck stock transfer feature from the Stock page:
 Production (`origin/main` @ `0c8b2a9`, last successful Hetzner deploy run
 `27539230901`) still has the original `1c9bb2a` implementation — the
 "تحويل إلى شاحنة" button is still live on
-`https://deleveri.alllal.com/stock`.
+`https://alg.alllal.com/stock`.
 
 **Note**: the `stock_transfers` / `stock_transfer_items` DB tables and their
 sync registration (`FK_SYNC_RULES`/`PULL_TABLES`/`PUSH_TABLES` in
@@ -849,7 +849,7 @@ already-installed desktop apps).
 The shared frontend (`artifacts/erp-van-sales`) was rebuilt into a cinematic
 "Operations Center" command-center experience, and the cloud API received its
 first authentication hardening pass. **This is the version running on
-production** (`deleveri.alllal.com`) as of 2026-06-18.
+production** (`alg.alllal.com`) as of 2026-06-18.
 
 ### Frontend (UI / experience)
 - One persistent command-center shell (top Command Bar + contextual subnav, no

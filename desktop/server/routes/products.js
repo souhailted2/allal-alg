@@ -56,7 +56,7 @@ router.get("/storage/uploads/:filename", (req, res) => {
   if (!cookie) return res.status(404).json({ error: "الملف غير موجود" });
 
   const https = require("https");
-  const cloudUrl = `https://deleveri.alllal.com/api/storage/uploads/${filename}`;
+  const cloudUrl = `https://alg.alllal.com/api/storage/uploads/${filename}`;
   const cloudReq = https.get(cloudUrl, { headers: { cookie } }, (cloudRes) => {
     if (cloudRes.statusCode !== 200) return res.status(404).end();
     const ct = cloudRes.headers["content-type"] || "image/jpeg";

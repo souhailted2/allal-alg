@@ -4,7 +4,7 @@ const http = require("http");
 const { getDb } = require("../db");
 
 const router = Router();
-const REMOTE_BASE = "https://deleveri.alllal.com/api";
+const REMOTE_BASE = "https://alg.alllal.com/api";
 
 // The desktop app has NO local dispatch store and does not pull `truck_dispatches`
 // during sync. Truck dispatch lives only in the cloud (the mobile/truck app receives

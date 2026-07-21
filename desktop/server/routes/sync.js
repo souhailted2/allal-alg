@@ -4,7 +4,7 @@ const https = require("https");
 const http = require("http");
 
 const router = Router();
-const REMOTE_BASE = "https://deleveri.alllal.com/api";
+const REMOTE_BASE = "https://alg.alllal.com/api";
 
 // ── HTTP helper ──────────────────────────────────────────────────────────────
 

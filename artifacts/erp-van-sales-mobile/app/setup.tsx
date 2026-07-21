@@ -37,7 +37,7 @@ export default function SetupScreen() {
   const insets = useSafeAreaInsets();
   const { truckLogin } = useAuth();
 
-  const [serverUrl, setServerUrl] = useState("https://deleveri.alllal.com");
+  const [serverUrl, setServerUrl] = useState("https://alg.alllal.com");
   const [truckName, setTruckName] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -155,7 +155,7 @@ export default function SetupScreen() {
                   <Feather name="server" size={16} color={c.textMuted} style={styles.inputIcon} />
                   <TextInput
                     style={[styles.input, { color: c.text }]}
-                    placeholder="https://deleveri.alllal.com"
+                    placeholder="https://alg.alllal.com"
                     placeholderTextColor={c.textFaint}
                     value={serverUrl}
                     onChangeText={setServerUrl}

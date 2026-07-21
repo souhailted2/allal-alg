@@ -5,7 +5,7 @@
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/souhailted2/delivery_van.git"
+    "url": "https://github.com/souhailted2/allal-alg.git"
   },
   "scripts": {
     "standalone": "node standalone/server.js",
@@ -25,7 +25,7 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.erp.vansales",
+    "appId": "com.erp.vansales.alg",
     "productName": "ERP Van Sales",
     "copyright": "© 2025 ERP Van Sales",
     "directories": {
@@ -46,7 +46,7 @@
       {
         "provider": "github",
         "owner": "souhailted2",
-        "repo": "delivery_van"
+        "repo": "allal-alg"
       }
     ],
     "win": {
@@ -64,7 +64,7 @@
       "installerHeaderIcon": "build/icon.ico",
       "deleteAppDataOnUninstall": false,
       "license": null,
-      "artifactName": "ERP-Van-Sales-Setup-${version}.${ext}"
+      "artifactName": "ERP-Van-Sales-ALG-Setup-${version}.${ext}"
     },
     "nodeGypRebuild": false,
     "buildDependenciesFromSource": false,

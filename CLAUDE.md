@@ -83,7 +83,7 @@ separate codebase — assume nothing is shared unless verified.
   `canSellOnCredit`/`trucks.can_sell_on_credit`.
 - `truck_dispatches` is **cloud-only** (not synced). Desktop has no local
   table — `desktop/server/routes/dispatches.js` is a pure proxy to
-  `https://deleveri.alllal.com/api/dispatches*`.
+  `https://alg.alllal.com/api/dispatches*`.
 - Invoice creation must atomically: deduct `truck_stock`, apply commission,
   adjust `clients.balance` if credit. Mobile push must be idempotent
   (`ON CONFLICT DO NOTHING` + RETURNING-gated reconciliation) — never
@@ -107,7 +107,7 @@ session/CORS handling. Do not regress these:
 - **Cookies**: `secure` in production + `sameSite:lax` + `httpOnly`, with
   `app.set("trust proxy", 1)` so the cookie is issued behind nginx (which
   forwards `X-Forwarded-Proto`). **CORS**: allowlist via `CORS_ORIGINS`
-  (defaults to `https://deleveri.alllal.com`); no-Origin (server-to-server
+  (defaults to `https://alg.alllal.com`); no-Origin (server-to-server
   sync) allowed; unknown browser origins → 403. A global Express error handler
   keeps stack traces out of prod responses.
 - **Scope**: these are CLOUD-only. The desktop local server
@@ -146,7 +146,7 @@ session/CORS handling. Do not regress these:
    response, `lastPushErrors`/`lastPushTables` on desktop) — never swallow
    silently.
 7. `desktop/server/sync-engine.js` hardcodes
-   `REMOTE_BASE = "https://deleveri.alllal.com/api"` (production). Never point
+   `REMOTE_BASE = "https://alg.alllal.com/api"` (production). Never point
    this at a different URL in a commit; if testing against staging, edit
    locally only and revert before commit.
 8. **Sync epoch (P0-2 resurrection gate)** — `sync_state.epoch` (singleton
@@ -214,7 +214,7 @@ session/CORS handling. Do not regress these:
   has the 12-scenario test plan and a 118/118 baseline — extend it, don't
   replace it.
 - Never run sync code against the real `REMOTE_BASE`
-  (`https://deleveri.alllal.com`) from tests/sandboxes.
+  (`https://alg.alllal.com`) from tests/sandboxes.
 - For UI changes: start the dev server and exercise the actual feature in a
   browser (golden path + edge cases) — typecheck alone doesn't verify feature
   correctness.
