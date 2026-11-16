@@ -14,13 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Banknote, Search, X } from "lucide-react";
+import { Plus, Trash2, Banknote, Search, X, Package, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 type PurchaseItemRow = { productId: string; quantity: string; purchasePrice: string };
-const emptyItem = (): PurchaseItemRow => ({ productId: "", quantity: "1", purchasePrice: "0" });
 
 export default function Achats() {
   const { data, isLoading } = useListPurchases();
@@ -46,7 +45,8 @@ export default function Achats() {
   const [addOpen, setAddOpen] = useState(false);
   const [supplierId, setSupplierId] = useState("");
   const [initialPayment, setInitialPayment] = useState("0");
-  const [items, setItems] = useState<PurchaseItemRow[]>([emptyItem()]);
+  const [items, setItems] = useState<PurchaseItemRow[]>([]);
+  const [productSearch, setProductSearch] = useState("");
 
   // Payment modal
   const [payOpen, setPayOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function Achats() {
         invalidate();
         queryClient.invalidateQueries({ queryKey: ["/api/suppliers"] });
         toast.success("تم إنشاء أمر الشراء بنجاح");
-        setSupplierId(""); setInitialPayment("0"); setItems([emptyItem()]); setAddOpen(false);
+        setSupplierId(""); setInitialPayment("0"); setItems([]); setProductSearch(""); setAddOpen(false);
       },
       onError: () => toast.error("حدث خطأ أثناء إنشاء أمر الشراء"),
     },
@@ -83,10 +83,28 @@ export default function Achats() {
   const setItem = (idx: number, field: keyof PurchaseItemRow, value: string) =>
     setItems((prev) => prev.map((it, i) => i === idx ? { ...it, [field]: value } : it));
 
-  const autofillPrice = (idx: number, productId: string) => {
+  // نفس طريقة البيع: الضغط على صورة المنتج يضيفه، والضغط مرة أخرى يزيد الكمية
+  const addProduct = (productId: string) => {
     const prod = products.find((p) => String(p.id) === productId);
-    if (prod) setItems((prev) => prev.map((it, i) => i === idx ? { ...it, productId, purchasePrice: String(prod.purchasePrice) } : it));
+    if (!prod) return;
+    setItems((prev) => {
+      const i = prev.findIndex((it) => it.productId === productId);
+      if (i >= 0) return prev.map((it, k) => k === i ? { ...it, quantity: String((Number(it.quantity) || 0) + 1) } : it);
+      return [...prev, { productId, quantity: "1", purchasePrice: String(prod.purchasePrice ?? 0) }];
+    });
   };
+  const changeQty = (idx: number, delta: number) =>
+    setItems((prev) => prev
+      .map((it, i) => i === idx ? { ...it, quantity: String(Math.max(0, (Number(it.quantity) || 0) + delta)) } : it)
+      .filter((it) => Number(it.quantity) > 0));
+
+  const filteredProducts = productSearch.trim()
+    ? products.filter((p) => {
+        const q = productSearch.trim().toLowerCase();
+        return p.name.toLowerCase().includes(q) || (p.barcode ?? "").toLowerCase().includes(q);
+      })
+    : products;
+  const purchaseTotal = items.reduce((sum, it) => sum + (Number(it.quantity) || 0) * (Number(it.purchasePrice) || 0), 0);
 
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,7 +168,7 @@ export default function Achats() {
 
       {/* Create Purchase Dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>إنشاء أمر شراء جديد</DialogTitle></DialogHeader>
           <form onSubmit={handleCreateSubmit} className="space-y-5">
             <div className="space-y-2">
@@ -166,43 +184,107 @@ export default function Achats() {
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <Label>المنتجات *</Label>
-                <Button type="button" size="sm" variant="outline" onClick={() => setItems((p) => [...p, emptyItem()])}>
-                  <Plus className="h-3.5 w-3.5 ml-1" /> إضافة منتج
-                </Button>
+              <Label>المنتجات *</Label>
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  placeholder="ابحث عن منتج بالاسم أو الباركود..."
+                  className="pr-9 pl-9"
+                />
+                {productSearch && (
+                  <button type="button" onClick={() => setProductSearch("")} className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                )}
               </div>
-              {items.map((it, idx) => (
-                <div key={idx} className="grid grid-cols-[1fr_80px_100px_36px] gap-2 items-end">
-                  <div>
-                    {idx === 0 && <Label className="text-xs text-muted-foreground mb-1 block">المنتج</Label>}
-                    <Select value={it.productId} onValueChange={(v) => autofillPrice(idx, v)}>
-                      <SelectTrigger><SelectValue placeholder="اختر..." /></SelectTrigger>
-                      <SelectContent>
-                        {products.map((p) => (
-                          <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+
+              {/* شبكة المنتجات بالصور — مثل شاشة البيع */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[38vh] overflow-y-auto p-1 border rounded-lg">
+                {filteredProducts.length === 0 ? (
+                  <div className="col-span-full text-center py-10 text-muted-foreground">
+                    <Package className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                    <p className="text-sm">{productSearch ? "لا توجد نتائج" : "لا توجد منتجات"}</p>
                   </div>
-                  <div>
-                    {idx === 0 && <Label className="text-xs text-muted-foreground mb-1 block">الكمية</Label>}
-                    <Input type="number" min="1" value={it.quantity} onChange={(e) => setItem(idx, "quantity", e.target.value)} />
+                ) : (
+                  filteredProducts.map((p) => {
+                    const inCart = items.find((it) => it.productId === String(p.id));
+                    return (
+                      <button
+                        type="button"
+                        key={p.id}
+                        onClick={() => addProduct(String(p.id))}
+                        className={`relative flex flex-col rounded-lg border-2 overflow-hidden text-right transition-all active:scale-95 ${inCart ? "border-primary shadow-md" : "border-border hover:border-primary/50"}`}
+                      >
+                        <div className="w-full aspect-square bg-muted flex items-center justify-center overflow-hidden">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                          ) : (
+                            <Package className="h-8 w-8 text-muted-foreground/30" />
+                          )}
+                        </div>
+                        <div className="p-1.5 bg-card">
+                          <p className="text-xs font-semibold leading-tight line-clamp-2">{p.name}</p>
+                          <p className="text-xs text-primary font-bold mt-0.5">{formatCurrency(p.purchasePrice ?? 0)}</p>
+                          <p className="text-[11px] text-muted-foreground">المخزون: {p.stockQuantity} {p.unit}</p>
+                        </div>
+                        {inCart && (
+                          <div className="absolute top-1.5 left-1.5 bg-primary text-primary-foreground rounded-full min-w-6 h-6 px-1 flex items-center justify-center text-xs font-bold shadow">
+                            {inCart.quantity}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* المنتجات المختارة */}
+              {items.length > 0 && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-[40px_1fr_120px_100px_36px] gap-2 text-xs text-muted-foreground px-1">
+                    <span></span><span>المنتج</span><span>الكمية</span><span>سعر الشراء</span><span></span>
                   </div>
-                  <div>
-                    {idx === 0 && <Label className="text-xs text-muted-foreground mb-1 block">سعر الشراء</Label>}
-                    <Input type="number" min="0" value={it.purchasePrice} onChange={(e) => setItem(idx, "purchasePrice", e.target.value)} />
+                  {items.map((it, idx) => {
+                    const prod = products.find((p) => String(p.id) === it.productId);
+                    return (
+                      <div key={it.productId} className="grid grid-cols-[40px_1fr_120px_100px_36px] gap-2 items-center">
+                        <div className="w-10 h-10 rounded-md bg-muted overflow-hidden flex items-center justify-center border">
+                          {prod?.imageUrl ? (
+                            <img src={prod.imageUrl} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Package className="h-5 w-5 text-muted-foreground/40" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium truncate">{prod?.name ?? "—"}</span>
+                        <div className="flex items-center gap-1">
+                          <Button type="button" size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => changeQty(idx, -1)}>
+                            <Minus className="h-3.5 w-3.5" />
+                          </Button>
+                          <Input type="number" min="1" className="h-8 px-1 text-center" value={it.quantity}
+                            onChange={(e) => setItem(idx, "quantity", e.target.value)} />
+                          <Button type="button" size="icon" variant="outline" className="h-8 w-8 shrink-0" onClick={() => changeQty(idx, 1)}>
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                        <Input type="number" min="0" className="h-8" value={it.purchasePrice}
+                          onChange={(e) => setItem(idx, "purchasePrice", e.target.value)} />
+                        <Button
+                          type="button" size="icon" variant="ghost"
+                          className="h-8 w-8 text-destructive hover:text-destructive"
+                          onClick={() => setItems((p) => p.filter((_, i) => i !== idx))}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
+                  <div className="flex justify-end pt-1">
+                    <span className="text-sm font-bold">المجموع: {formatCurrency(purchaseTotal)}</span>
                   </div>
-                  <Button
-                    type="button" size="icon" variant="ghost"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => setItems((p) => p.filter((_, i) => i !== idx))}
-                    disabled={items.length === 1}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
-              ))}
+              )}
             </div>
 
             <div className="space-y-2">
